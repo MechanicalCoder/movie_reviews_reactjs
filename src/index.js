@@ -7,7 +7,7 @@ import * as serviceWorker from './serviceWorker';
 ReactDOM.render(
   <React.StrictMode>
     <App />
-    <center><p>Made using React {React.version} by <a href="http://chandansinha.me" target="_blank"> Chandan Sinha </a></p></center>
+    <center><p>Made using React {React.version} by <a href="http://chandansinha.me" target="_blank" rel="noopener noreferrer"> Chandan Sinha </a></p></center>
   </React.StrictMode>,
   document.getElementById('root')
 );

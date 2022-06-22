@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import axios from 'axios';
 import './App.css';
 
 class App extends Component {
@@ -12,19 +13,17 @@ class App extends Component {
       title:[],
       rating:[],
       review:[],
-      thumbnail:[]
+      thumbnail:[],
+      year:[]
     };
   }
 
   componentDidMount(){
-    const url = 'https://spreadsheets.google.com/feeds/cells/1oLYphfH_bGeqWSxqysMjBD2me27L6YdNk9wQwjOfQMc/1/public/full?alt=json'
-
-    fetch(url)
-      .then(result => result.json())
+    axios.get('https://sheet.best/api/sheets/0e6256d0-a83e-4fd1-bf06-02af04872061')
       .then(result => {
         this.setState({
           isLoaded: true,
-          items: result.feed.entry
+          items:result.data
         });
       },
 
@@ -37,8 +36,13 @@ class App extends Component {
     )
   }
 
+  handleClick = () => {
+    const year_mark = this.innerText;
+    console.log(year_mark);
+  }
+
   render(){
-    const {error, isLoaded, items, day, title, rating, review, thumbnail} = this.state;
+    const {error, isLoaded, items, day, title, rating, review, thumbnail, year} = this.state;
 
     if(error){
       return <div>Error: {error.message}</div>;
@@ -47,30 +51,38 @@ class App extends Component {
       return <div>Loading...</div>;
     } 
     else{
-      for(var i=5;i<items.length;i+=5){
-        day.push(items[i].content.$t);
-        title.push(items[i+1].content.$t);
-        rating.push(items[i+2].content.$t);
-        review.push(items[i+3].content.$t);
-        thumbnail.push(items[i+4].content.$t);
-     }
+      for(var i=0;i<items.length;i+=1){
+        day.push(items[i].Day);
+        title.push(items[i].Title);
+        rating.push(items[i].Rating);
+        review.push(items[i].Review);
+        thumbnail.push(items[i].Thumbnail);
+        const year_string = items[i].Day.toString().split('/');
+        year.push(year_string[2]);
+      }
+      const uniqueYears = year.filter((x, i, a) => a.indexOf(x) == i);
+      console.log(uniqueYears);
+      var buttonlist = [];
+      for(var j=1; j<uniqueYears.length; j++){
+        buttonlist.push(<button className="waves-effect waves-light btn-large" onClick={this.handleClick}>{uniqueYears[j]}</button>)
+      }
       return (
         <div className="App">
-          <h1> Movies List </h1>
-          <h2> 2020 </h2>
-          <div class="row">
+          <h1> OrangeDurito's Movies List </h1> 
+          <div className="buttons">{buttonlist}</div>
+          <div className="row">
             {title.map((item,index) =>(
-              <div class="col s12 m6 l4">
-                <div class="card">
-                  <div class="card-image waves-effect waves-block waves-light">
-                    <img class="activator" src={thumbnail[index]}/>
+              <div className="col s12 m6 l4" key={index}>
+                <div className="card">
+                  <div className="card-image waves-effect waves-block waves-light">
+                    <img className="activator" alt="thumbnail" src={thumbnail[index]}/>
                   </div>
-                  <div class="card-content">
-                    <span class="card-title activator grey-text text-darken-4"><center>{item}</center><i class="material-icons right">more_vert</i></span>
-                    <center><p><span class="grey-text text-darken-4">Rating: <b>{rating[index]}</b></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Date: <b>{day[index]}</b></p></center>
+                  <div className="card-content">
+                    <span className="card-title activator grey-text text-darken-4"><center>{item}</center><i className="material-icons right">more_vert</i></span>
+                    <center><p><span className="grey-text text-darken-4">Rating: <b>{rating[index]}</b></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Date: <b>{day[index]}</b></p></center>
                   </div>
-                  <div class="card-reveal">
-                    <span class="card-title grey-text text-darken-4"><b>Review</b><i class="material-icons right">close</i></span>
+                  <div className="card-reveal">
+                    <span className="card-title grey-text text-darken-4"><b>Review</b><i className="material-icons right">close</i></span>
                     <p>{review[index]}</p>
                   </div>
                 </div>
